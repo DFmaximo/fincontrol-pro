@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { TrendingUp, TrendingDown, Wallet, CreditCard, Target, Zap, ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
@@ -34,8 +35,9 @@ function StatCard({ title, value, sub, color, icon, positive, delay = 0 }: {
 }
 
 export default function DashboardPage() {
+  const janMonth = useMemo(() => new Date(2024, 0, 1), [])
   const { totalBalance, totalAvailable } = useAccounts()
-  const { totalIncome, totalExpense } = useTransactions({ month: new Date(2024, 0, 1) })
+  const { totalIncome, totalExpense } = useTransactions({ month: janMonth })
 
   const balanceHistory = mockMonthlyData.map(d => ({ month: d.month, value: d.income - d.expense }))
 
