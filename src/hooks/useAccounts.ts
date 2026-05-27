@@ -2,6 +2,10 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase, isSupabaseConfigured } from '@/lib/supabase'
 import { mockAccounts } from '@/data/mock'
 import type { Account } from '@/types/database'
+import {
+  recordDeposit,
+  recordTransfer,
+} from '@/modules/transactions/services/transactionService'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any
@@ -47,11 +51,13 @@ export function useAccounts() {
     return () => { supabase.removeChannel(channel) }
   }, [fetchAccounts])
 
-  const totalBalance = accounts.reduce((sum, a) => sum + a.balance, 0)
+  const totalBalance   = accounts.reduce((sum, a) => sum + a.balance, 0)
   const totalAvailable = accounts.reduce((sum, a) => sum + a.available_balance, 0)
 
+  /** Deposit / credit — routed through transaction service so every movement is recorded */
   async function deposit(accountId: string, amount: number, description: string) {
     if (!isSupabaseConfigured) {
+      // Mock: optimistic update
       setAccounts(prev =>
         prev.map(a =>
           a.id === accountId
@@ -61,51 +67,48 @@ export function useAccounts() {
       )
       return
     }
-    const account = accounts.find(a => a.id === accountId)
-    if (!account) return
-    await db.from('accounts').update({
-      balance: account.balance + amount,
-      available_balance: account.available_balance + amount,
-    }).eq('id', accountId)
-    await db.from('transactions').insert({
-      account_id: accountId,
-      description,
+    await recordDeposit({
+      accountId,
       amount,
-      type: 'income',
-      status: 'completed',
-      occurred_on: new Date().toISOString().split('T')[0],
+      description,
+      effectiveDate: new Date().toISOString().split('T')[0],
+      source: 'accounts',
     })
     await fetchAccounts()
   }
 
+  /** Transfer between accounts — routed through transaction service (creates linked pair) */
   async function transfer(fromId: string, toId: string, amount: number, description: string) {
     if (!isSupabaseConfigured) {
+      // Mock: optimistic update
       setAccounts(prev =>
         prev.map(a => {
           if (a.id === fromId) return { ...a, balance: a.balance - amount, available_balance: a.available_balance - amount }
-          if (a.id === toId) return { ...a, balance: a.balance + amount, available_balance: a.available_balance + amount }
+          if (a.id === toId)   return { ...a, balance: a.balance + amount, available_balance: a.available_balance + amount }
           return a
         })
       )
       return
     }
-    const from = accounts.find(a => a.id === fromId)
-    const to = accounts.find(a => a.id === toId)
-    if (!from || !to) return
-    await Promise.all([
-      db.from('accounts').update({ balance: from.balance - amount, available_balance: from.available_balance - amount }).eq('id', fromId),
-      db.from('accounts').update({ balance: to.balance + amount, available_balance: to.available_balance + amount }).eq('id', toId),
-      db.from('transactions').insert([
-        { account_id: fromId, destination_account_id: toId, description, amount: -amount, type: 'transfer', status: 'completed', occurred_on: new Date().toISOString().split('T')[0] },
-        { account_id: toId, destination_account_id: fromId, description, amount, type: 'transfer', status: 'completed', occurred_on: new Date().toISOString().split('T')[0] },
-      ]),
-    ])
+    await recordTransfer({
+      fromAccountId: fromId,
+      toAccountId:   toId,
+      amount,
+      description,
+      effectiveDate: new Date().toISOString().split('T')[0],
+    })
     await fetchAccounts()
   }
 
   async function createAccount(data: Omit<Account, 'id' | 'created_at' | 'updated_at' | 'user_id'>) {
     if (!isSupabaseConfigured) {
-      const newAcc: Account = { ...data, id: crypto.randomUUID(), user_id: 'u1', created_at: new Date().toISOString(), updated_at: new Date().toISOString() }
+      const newAcc: Account = {
+        ...data,
+        id:         crypto.randomUUID(),
+        user_id:    'u1',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }
       setAccounts(prev => [...prev, newAcc])
       return
     }
@@ -113,5 +116,15 @@ export function useAccounts() {
     await fetchAccounts()
   }
 
-  return { accounts, loading, error, totalBalance, totalAvailable, deposit, transfer, createAccount, refetch: fetchAccounts }
+  return {
+    accounts,
+    loading,
+    error,
+    totalBalance,
+    totalAvailable,
+    deposit,
+    transfer,
+    createAccount,
+    refetch: fetchAccounts,
+  }
 }
