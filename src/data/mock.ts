@@ -1,5 +1,6 @@
 import type { Account, Category } from '@/types/database'
 import type { Transaction } from '@/modules/transactions/types'
+import type { Card, Invoice } from '@/types/cards'
 
 export const mockCategories: Category[] = [
   { id: 'c1', user_id: 'u1', name: 'Salário', icon: 'briefcase', color: '#00d87f', type: 'income', created_at: '2024-01-01' },
@@ -93,6 +94,72 @@ export const mockTransactions: Transaction[] = [
     accounts: mockAccounts[0],
     categories: mockCategories[2],
   }),
+]
+
+export const mockCards: Card[] = [
+  {
+    id: 'card1',
+    user_id: 'u1',
+    name: 'Nubank Platinum',
+    bank_name: 'Nubank',
+    last_four: '4521',
+    brand: 'mastercard',
+    credit_limit: 12000,
+    available_limit: 8450,
+    closing_day: 15,
+    due_day: 22,
+    color: '#8b5cf6',
+    icon: 'credit-card',
+    is_active: true,
+    created_at: '2024-01-01',
+    updated_at: '2024-01-01',
+  },
+  {
+    id: 'card2',
+    user_id: 'u1',
+    name: 'Inter Gold',
+    bank_name: 'Inter',
+    last_four: '7832',
+    brand: 'mastercard',
+    credit_limit: 6000,
+    available_limit: 5200,
+    closing_day: 5,
+    due_day: 12,
+    color: '#ff9443',
+    icon: 'credit-card',
+    is_active: true,
+    created_at: '2024-01-01',
+    updated_at: '2024-01-01',
+  },
+]
+
+export const mockInvoices: Invoice[] = [
+  {
+    id: 'inv1',
+    card_id: 'card1',
+    year: 2024,
+    month: 1,
+    status: 'open',
+    total_amount: 3550.00,
+    paid_amount: 0,
+    closing_date: '2024-01-15',
+    due_date: '2024-01-22',
+    created_at: '2024-01-01',
+    updated_at: '2024-01-01',
+  },
+  {
+    id: 'inv2',
+    card_id: 'card2',
+    year: 2024,
+    month: 1,
+    status: 'open',
+    total_amount: 800.00,
+    paid_amount: 0,
+    closing_date: '2024-01-05',
+    due_date: '2024-01-12',
+    created_at: '2024-01-01',
+    updated_at: '2024-01-01',
+  },
 ]
 
 export const mockMonthlyData = [
