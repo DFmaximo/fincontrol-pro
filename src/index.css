@@ -1,0 +1,139 @@
+@import "tailwindcss";
+
+@theme {
+  /* ── Background layers ── */
+  --color-bg: #06060a;
+  --color-surface: #08090f;
+  --color-card: #0c0d18;
+  --color-card-hover: #10121f;
+  --color-elevated: #13152a;
+
+  /* ── Borders ── */
+  --color-border: #1c1f32;
+  --color-border-subtle: #131628;
+
+  /* ── Text ── */
+  --color-text: #e6e8f0;
+  --color-muted: #8490b0;
+  --color-dim: #444c6a;
+
+  /* ── Accents ── */
+  --color-green: #00d87f;
+  --color-green-light: #00ff9d;
+  --color-cyan: #00cce8;
+  --color-cyan-light: #40e0ff;
+  --color-blue-dark: #0d1b3e;
+  --color-purple: #8b5cf6;
+  --color-red: #ff3860;
+  --color-orange: #ff9443;
+  --color-yellow: #ffd60a;
+
+  /* ── Custom breakpoints ── */
+  --breakpoint-xs: 480px;
+  --breakpoint-3xl: 1920px;
+  --breakpoint-4xl: 2560px;
+
+  /* ── Font ── */
+  --font-family-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* ── Base ─────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  color-scheme: dark;
+}
+
+@media (min-width: 1920px) {
+  html { font-size: 16.5px; }
+}
+@media (min-width: 2560px) {
+  html { font-size: 17px; }
+}
+
+body {
+  margin: 0;
+  background-color: #06060a;
+  color: #e6e8f0;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ── Scrollbar ─────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #1c1f32; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #252840; }
+
+/* ── Selection ────────────────────────────────── */
+::selection {
+  background: rgba(0, 216, 127, 0.22);
+  color: #e6e8f0;
+}
+
+/* ── Focus ────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid rgba(0, 216, 127, 0.55);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── Glow helpers ─────────────────────────────── */
+.glow-green {
+  box-shadow: 0 0 24px rgba(0, 216, 127, 0.18), 0 0 48px rgba(0, 216, 127, 0.07);
+}
+.glow-cyan {
+  box-shadow: 0 0 24px rgba(0, 204, 232, 0.18), 0 0 48px rgba(0, 204, 232, 0.07);
+}
+.glow-red {
+  box-shadow: 0 0 24px rgba(255, 56, 96, 0.18), 0 0 48px rgba(255, 56, 96, 0.07);
+}
+
+/* ── Glassmorphism ────────────────────────────── */
+.glass {
+  background: rgba(12, 13, 24, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* ── Nav active indicator ─────────────────────── */
+.nav-active-bar {
+  position: relative;
+}
+.nav-active-bar::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 18px;
+  background: linear-gradient(180deg, #00d87f, #00cce8);
+  border-radius: 0 3px 3px 0;
+}
+
+/* ── Gradient text ────────────────────────────── */
+.text-gradient-green {
+  background: linear-gradient(135deg, #00d87f, #00cce8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Animations ───────────────────────────────── */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+.animate-pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
