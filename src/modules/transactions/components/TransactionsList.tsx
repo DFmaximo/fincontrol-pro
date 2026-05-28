@@ -314,11 +314,36 @@ export default function TransactionsList({
                       </div>
                     </td>
 
-                    {/* Date */}
+                    {/* Date + due date badge */}
                     <td className="px-4 py-3.5">
-                      <span className="text-sm tabular-nums" style={{ color: '#8490b0' }}>
-                        {formatDate(tx.effective_date ?? tx.occurred_on)}
-                      </span>
+                      <div className="flex flex-col gap-1">
+                        <span className="text-sm tabular-nums" style={{ color: '#8490b0' }}>
+                          {formatDate(tx.effective_date ?? tx.occurred_on)}
+                        </span>
+                        {tx.due_date && tx.status !== 'completed' && tx.status !== 'cancelled' && (() => {
+                          const today    = new Date(); today.setHours(0,0,0,0)
+                          const due      = new Date(tx.due_date + 'T12:00:00')
+                          const diffDays = Math.ceil((due.getTime() - today.getTime()) / 86400000)
+                          const overdue  = diffDays < 0
+                          const soonDue  = diffDays >= 0 && diffDays <= 3
+                          if (!overdue && !soonDue) return (
+                            <span className="text-xs tabular-nums" style={{ color: '#444c6a' }}>
+                              Vence {formatDate(tx.due_date)}
+                            </span>
+                          )
+                          return (
+                            <span
+                              className="text-xs font-semibold tabular-nums px-1.5 py-0.5 rounded-md"
+                              style={{
+                                background: overdue ? 'rgba(255,56,96,0.12)' : 'rgba(255,148,67,0.12)',
+                                color:      overdue ? '#ff3860' : '#ff9443',
+                              }}
+                            >
+                              {overdue ? `Vencida há ${Math.abs(diffDays)}d` : diffDays === 0 ? 'Vence hoje!' : `Vence em ${diffDays}d`}
+                            </span>
+                          )
+                        })()}
+                      </div>
                     </td>
 
                     {/* Source */}

@@ -52,6 +52,7 @@ export interface Transaction {
   is_recurring: boolean
   recurring_transaction_id: string | null
   transfer_pair_id: string | null
+  due_date: string | null
   notes: string | null
   tags: string[] | null
   created_at: string
@@ -73,6 +74,7 @@ export interface CreateTransactionInput {
   status: TransactionStatus
   source: TransactionSource
   effective_date: string
+  due_date?: string | null
   is_recurring?: boolean
   recurring_frequency?: RecurrenceFrequency
   notes?: string | null

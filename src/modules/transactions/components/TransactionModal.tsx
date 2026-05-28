@@ -121,6 +121,9 @@ export default function TransactionModal({ open, transaction, onClose, onSaved }
   const [customInstall,  setCustomInstall]  = useState('')
   const [installMode,    setInstallMode]    = useState<InstallMode>('total')
 
+  // ── Due date (vencimento) ─────────────────────────────────
+  const [dueDate, setDueDate] = useState('')
+
   // ── Adjustment-specific ───────────────────────────────────
   const [adjDir, setAdjDir] = useState<AdjustDir>('debit')
 
@@ -185,6 +188,7 @@ export default function TransactionModal({ open, transaction, onClose, onSaved }
       setStatus(transaction.status)
       setDate(transaction.effective_date ?? transaction.occurred_on)
       setNotes(transaction.notes ?? '')
+      setDueDate(transaction.due_date ?? '')
       setIsRecurring(transaction.is_recurring)
     } else {
       resetForm()
@@ -215,7 +219,8 @@ export default function TransactionModal({ open, transaction, onClose, onSaved }
     setNotes(''); setIsRecurring(false); setFrequency('monthly')
     setPayMethod('account'); setCardId(''); setIsInstallment(false)
     setInstallCount(6); setCustomInstall(''); setInstallMode('total')
-    setAdjDir('debit'); setPayCardId(''); setPayFullInvoice(true); setDone(false)
+    setAdjDir('debit'); setPayCardId(''); setPayFullInvoice(true)
+    setDueDate(''); setDone(false)
   }
 
   function handleClose() { if (!loading) { resetForm(); onClose() } }
@@ -254,6 +259,7 @@ export default function TransactionModal({ open, transaction, onClose, onSaved }
         source:                 (type === 'expense' && payMethod === 'card'
           ? 'cards'
           : 'manual') as TransactionSource,
+        due_date:       dueDate || null,
         effective_date: date,
         is_recurring:   isRecurring && payMethod === 'account',
         recurring_frequency: isRecurring ? frequency : undefined,
@@ -716,11 +722,21 @@ export default function TransactionModal({ open, transaction, onClose, onSaved }
                           </div>
                         )}
 
-                        {/* Date + Status */}
-                        <div className="grid grid-cols-2 gap-3">
+                        {/* Date + Due date + Status */}
+                        <div className="grid grid-cols-3 gap-3">
                           <div>
                             <Lbl>{payMethod === 'card' ? 'Data da compra' : 'Data da despesa'}</Lbl>
                             <input style={F} type="date" value={date} onChange={e => setDate(e.target.value)} />
+                          </div>
+                          <div>
+                            <Lbl>Vencimento</Lbl>
+                            <input
+                              style={{ ...F, borderColor: dueDate && new Date(dueDate + 'T12:00:00') < new Date() ? '#ff386044' : '#1c1f32' }}
+                              type="date"
+                              value={dueDate}
+                              onChange={e => setDueDate(e.target.value)}
+                              placeholder="Opcional"
+                            />
                           </div>
                           <div>
                             <Lbl>Status</Lbl>
