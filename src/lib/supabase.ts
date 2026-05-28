@@ -13,3 +13,9 @@ export const supabase = createClient<Database>(
   supabaseUrl || 'https://placeholder.supabase.co',
   supabaseAnonKey || 'placeholder-anon-key-xxxxxxxxxxxxxxxx'
 )
+
+/**
+ * Placeholder user ID used while authentication is not yet implemented.
+ * Replace with `supabase.auth.getUser()` when auth is added.
+ */
+export const DEMO_USER_ID = '00000000-0000-0000-0000-000000000001'

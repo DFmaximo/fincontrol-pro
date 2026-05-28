@@ -8,7 +8,7 @@
  *   • Unified audit trail
  */
 
-import { supabase, isSupabaseConfigured } from '@/lib/supabase'
+import { supabase, isSupabaseConfigured, DEMO_USER_ID } from '@/lib/supabase'
 import type {
   Transaction,
   CreateTransactionInput,
@@ -75,6 +75,7 @@ export async function createTransaction(
     .from('transactions')
     .insert({
       ...input,
+      user_id:     DEMO_USER_ID,
       occurred_on: input.effective_date,
     })
     .select()
@@ -156,8 +157,8 @@ export async function recordTransfer(params: {
   const { data, error } = await db
     .from('transactions')
     .insert([
-      { ...debit,  occurred_on: date },
-      { ...credit, occurred_on: date },
+      { ...debit,  user_id: DEMO_USER_ID, occurred_on: date },
+      { ...credit, user_id: DEMO_USER_ID, occurred_on: date },
     ])
     .select()
 
